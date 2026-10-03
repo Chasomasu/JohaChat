@@ -61,7 +61,7 @@ async def process_merged_message(merged_msg: MergedMessage, bot_api) -> Optional
                     image_path=screenshot_path,
                 )
             else:
-                send_result = await bot_api.send_group_message(group_id=group_id, message=response)
+                send_result = await bot_api.send_group_message(group_id=int(group_id), message=response)
 
             # 提取消息 ID 并注册到群组状态，供 reply_to_bot 本地快速判定
             sent_msg_id = 0

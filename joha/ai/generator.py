@@ -8,7 +8,6 @@ from joha.core.response_postprocessor import post_processor
 from joha.config.logger import tprint
 import asyncio
 import logging
-import datetime
 from typing import List, Dict, Optional
 
 logger = logging.getLogger(__name__)
@@ -143,7 +142,8 @@ class Generator:
                 messages=list(messages),
                 temperature=temperature,
                 max_tokens=max_tokens,
-                stream=False
+                stream=False,
+                enable_tools=bool(enable_tools),
             )
             self._request_count += 1
             return result
@@ -179,23 +179,20 @@ class Generator:
             enable_tools: 是否启用工具，None 表示使用默认配置
         """
         try:
-            # 临时保存原始工具状态
-            original_enable_tools = self._client.enable_tools
-            effective_enable_tools = original_enable_tools if enable_tools is None else enable_tools
-            if enable_tools is not None:
-                self._client.enable_tools = enable_tools
+            # 本次调用的工具开关：None 表示跟随客户端默认配置
+            # 通过 call_with_context 的参数传递，不修改共享的
+            # self._client.enable_tools，避免与并发的 chat() 产生竞态
+            effective_enable_tools = (
+                self._client.enable_tools if enable_tools is None else enable_tools
+            )
 
-            try:
-                result = self._cached_chat(
-                    self._model,
-                    tuple(messages),
-                    temperature,
-                    max_tokens,
-                    bool(effective_enable_tools)
-                )
-            finally:
-                if enable_tools is not None:
-                    self._client.enable_tools = original_enable_tools
+            result = self._cached_chat(
+                self._model,
+                tuple(messages),
+                temperature,
+                max_tokens,
+                bool(effective_enable_tools)
+            )
 
             return result
         except Exception as e:
@@ -205,15 +202,6 @@ class Generator:
             return None
 
     def _build_messages(self, question: str, userid: str = None, group_id: Optional[str] = None) -> List[Dict[str, str]]:
-        hour = datetime.datetime.now().hour
-
-        if 14 <= hour < 18:
-            greeting = "下午好！"
-        elif 18 <= hour < 23:
-            greeting = "晚上好！"
-        else:
-            greeting = "你好！"
-
         return message_builder.build(
             user_id=userid or "unknown",
             message=question,

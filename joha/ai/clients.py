@@ -62,9 +62,16 @@ class OpenAICompatibleClient(BaseAIClient):
         temperature: float = 0.7,
         max_tokens: int = 2000,
         stream: bool = False,
+        enable_tools: Optional[bool] = None,
         **kwargs
     ) -> str:
-        """调用 AI 并返回回复（带指数退避重试）"""
+        """调用 AI 并返回回复（带指数退避重试）
+
+        enable_tools: None 表示使用实例默认值；传 bool 仅对本次调用生效，
+        不修改共享状态，避免并发调用互相干扰
+        """
+        use_tools = self.enable_tools if enable_tools is None else bool(enable_tools)
+
         def _do_call():
             call_kwargs = {
                 "model": self.model,
@@ -74,7 +81,7 @@ class OpenAICompatibleClient(BaseAIClient):
                 "stream": stream,
             }
 
-            if self.enable_tools and self.tools:
+            if use_tools and self.tools:
                 call_kwargs["tools"] = self.tools
                 call_kwargs["tool_choice"] = "auto"
 

@@ -18,29 +18,25 @@ class ResponsePostProcessor:
         self.thinking_patterns = [
             r'（[^）]*思考[^）]*）',  # 包含“思考”的括号内容
             r'【[^】]*思考[^】]*】',  # 包含“思考”的方括号内容
-            r'（.*?作为.*?）',  # “作为...”的括号内容
-            r'（.*?估计.*?）',  # “估计...”的括号内容
-            r'（.*?看来.*?）',  # “看来...”的括号内容
-            r'（.*?觉得.*?）',  # “觉得...”的括号内容
-            r'（对话结束.*?）',  # 对话结束标记
-            r'（.*?无需继续.*?）',  # 无需继续标记
+            r'（[^）]*作为[^）]*）',  # “作为...”的括号内容（[^\）] 防止跨括号对吞掉正文）
+            r'（[^）]*估计[^）]*）',  # “估计...”的括号内容
+            r'（[^）]*看来[^）]*）',  # “看来...”的括号内容
+            r'（[^）]*觉得[^）]*）',  # “觉得...”的括号内容
+            r'（对话结束[^）]*）',  # 对话结束标记
+            r'（[^）]*无需继续[^）]*）',  # 无需继续标记
         ]
-        
-        # 其他人格标识
+
+        # 其他人格标识（仅保留确定的他人格特征词，避免误杀正常回复）
         self.other_personas = [
             '小伊伊',
             '机器人已准备就绪',
-            '元气满满',
-            '收到指令',
         ]
-        
-        # 元认知模式
+
+        # 元认知模式（仅保留明确的人设泄漏表达；
+        # “我需要/我得/我觉得应该”等日常用语不再视为元认知，避免误杀）
         self.meta_cognitive_patterns = [
             r'作为大学生，我',
-            r'我觉得应该',
-            r'我需要',
             r'我要表达',
-            r'我得',
         ]
         
         # 多样化备用回复（避免总是返回相同的单字）
@@ -124,20 +120,24 @@ class ResponsePostProcessor:
         return False
     
     def _remove_meta_cognitive(self, text: str) -> str:
-        """移除元认知内容"""
+        """移除元认知内容（只删匹配片段，不整句替换，避免误杀正常回复）"""
         for pattern in self.meta_cognitive_patterns:
             if re.search(pattern, text):
-                # 如果包含元认知内容，整句替换为简单回复
                 logger.debug(f"检测到元认知内容: {pattern}")
-                return self._get_fallback_response()
+                text = re.sub(pattern, '', text)
         return text
-    
+
     def _clean_whitespace(self, text: str) -> str:
-        """清理多余空白"""
+        """清理多余空白（保留换行结构，不把多行回复压成一行）"""
         # 移除首尾空白
         text = text.strip()
-        # 合并多个空白字符
-        text = re.sub(r'\s+', ' ', text)
+        # 去掉每行行首行尾的空格/制表符
+        text = re.sub(r'[ \t]+\n', '\n', text)
+        text = re.sub(r'\n[ \t]+', '\n', text)
+        # 行内多个空格/制表符合并为一个空格
+        text = re.sub(r'[ \t]{2,}', ' ', text)
+        # 连续 2 个以上空行压缩为一个空行
+        text = re.sub(r'\n{3,}', '\n\n', text)
         return text
     
     def _get_fallback_response(self, tone: str = 'neutral') -> str:

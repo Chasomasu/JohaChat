@@ -284,11 +284,6 @@ class MessageService:
         except Exception as pp_err:
             johalog_logger.error(f"回复后处理失败：{pp_err}")
 
-        if not response:
-            self.failed_replies += 1
-            tprint("warning", f"[AI] 后处理后无有效回复，已跳过发送到群 | 用户{ctx.user_id}")
-            return False
-
         tprint("info", f"[AI] 回复: {response}")
         johalog_logger.info(
             f"[回复生成] 用户:{ctx.user_id}, 消息:{log_msg[:20]}..., 回复:{response[:20]}..."
