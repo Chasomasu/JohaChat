@@ -34,10 +34,7 @@ class MessageBuilder:
     ) -> List[Dict]:
         images = images or []
 
-        if group_id and persona_name == "joha":
-            persona = get_persona_by_group(group_id)
-        else:
-            persona = get_persona(persona_name)
+        persona = self._resolve_persona(group_id, persona_name)
         system_prompt = persona.get("system_prompt",
             "你是一个真实的大学生，说话自然随意，像普通人聊天。回复简短自然，不超过20字。")
 
@@ -100,30 +97,11 @@ class MessageBuilder:
 
         return context_messages
 
-    def build_system_prompt(self, user_id: str, persona_name: str = "joha",
-                            include_style: bool = True, group_id: Optional[str] = None) -> str:
+    def _resolve_persona(self, group_id: Optional[str], persona_name: str) -> dict:
+        """按群选择人设：默认人设(joha)在绑定群时按群绑定解析，其余按名称取"""
         if group_id and persona_name == "joha":
-            persona = get_persona_by_group(group_id)
-        else:
-            persona = get_persona(persona_name)
-        system_prompt = persona.get("system_prompt",
-            "你是一个真实的大学生，说话自然随意，像普通人聊天。回复简短自然，不超过20字。")
-
-        if include_style:
-            style_prompt = style_learner.get_user_style_prompt(user_id)
-            if style_prompt:
-                system_prompt += "\n\n" + style_prompt
-
-        return system_prompt
-
-    def _get_tool_descriptions(self) -> str:
-        """获取工具描述文本"""
-        try:
-            from joha.core.tool_registry import get_tool_registry
-            registry = get_tool_registry()
-            return registry.get_tool_descriptions()
-        except Exception:
-            return ""
+            return get_persona_by_group(group_id)
+        return get_persona(persona_name)
 
     def _check_name_call(self, message: str) -> bool:
         """检测用户是否称呼了AI的名字"""

@@ -3,7 +3,7 @@
 统一编排决策流水线：意图分析 → 回复概率 → 回复决策
 各子模块（分）保持专注单一职责，由本引擎串联整合
 """
-from typing import Dict, Optional
+from typing import Optional
 from dataclasses import dataclass
 
 from joha.decision.reply_decision import (
@@ -109,21 +109,6 @@ class DecisionEngine:
             f"[回复决策] 概率={result.probability:.3f}, 意图={result.intent}, "
             f"决策={'✅回复' if result.should_reply else '❌不回复'}"
         )
-
-    def get_stats(self) -> Dict:
-        """获取引擎统计"""
-        return {
-            "total_calls": self._stats["total_calls"],
-            "replied": self._stats["replied"],
-            "skipped": self._stats["skipped"],
-            "reply_rate": round(
-                self._stats["replied"] / max(self._stats["total_calls"], 1), 3
-            ),
-        }
-
-    def refresh(self):
-        """刷新各子模块状态"""
-        self.cooldown = cooldown_manager
 
 
 _engine_instance: Optional[DecisionEngine] = None

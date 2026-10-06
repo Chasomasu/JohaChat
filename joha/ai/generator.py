@@ -62,73 +62,9 @@ class Generator:
             return True
         return False
 
-    def get_available_models(self, role: str = "chat") -> List[Dict]:
-        """获取可用的模型列表
-        
-        Args:
-            role: 角色类型 (chat 或 classifier)
-            
-        Returns:
-            模型列表
-        """
-        return config.get_available_models(role)
-
-    def get_model_names(self, role: str = "chat") -> List[str]:
-        """获取模型名称列表
-        
-        Args:
-            role: 角色类型 (chat 或 classifier)
-            
-        Returns:
-            模型名称列表
-        """
-        return config.get_model_names(role)
-
-    def format_model_list(self, role: str = "chat") -> str:
-        """格式化输出模型列表
-        
-        Args:
-            role: 角色类型 (chat 或 classifier)
-            
-        Returns:
-            格式化的模型列表字符串
-        """
-        models = self.get_available_models(role)
-        if not models:
-            return "暂无可用的模型"
-        
-        active_provider = config.get_active_provider_name()
-        
-        # 构建标题
-        role_names = {"chat": "对话模型", "classifier": "分类器模型"}
-        title = f"📋 {role_names.get(role, role)}列表 ({len(models)}个)"
-        
-        lines = [title, "─" * 40]
-        for i, m in enumerate(models, 1):
-            # 标记当前激活的模型
-            if m['name'] == active_provider:
-                marker = "✅ "
-                suffix = " [当前]"
-            else:
-                marker = f"{i}. "
-                suffix = ""
-            
-            # 格式化显示：名称 - 标签 (模型名)
-            line = f"{marker}{m['name']}"
-            if m.get('label') and m['label'] != m['name']:
-                line += f" - {m['label']}"
-            line += f" ({m['model']}){suffix}"
-            lines.append(line)
-        
-        return "\n".join(lines)
-
     @property
     def current_model(self) -> str:
         return self._model
-
-    @property
-    def current_provider(self) -> str:
-        return config.get_active_provider_name() or "默认"
 
     @cache_result(response_cache, ttl=60)
     def _cached_chat(self, model: str, messages: tuple, temperature: float, max_tokens: int,
