@@ -142,7 +142,9 @@ class HistoryManager:
                     })
 
             self._write_all(userid_str, all_history)
-            self._cache.clear()
+            # 仅失效该用户的两个缓存键（带群/不带群），避免全量清缓存拖累他人
+            self._cache.delete(f"history_{userid_str}_all")
+            self._cache.delete(f"history_{userid_str}_{group_id if group_id else 'all'}")
             return self.load_history(userid_str, group_id=group_id)
 
     def clear_history(self, userid: str, group_id: Optional[str] = None) -> bool:

@@ -393,10 +393,6 @@ class PersonaManager:
             "traits": traits.to_dict(),
         }
 
-    def get_persona_by_userid(self, userid: str) -> Dict[str, str]:
-        """通过 userid 查找人设（保持兼容，返回活跃人设）"""
-        return self.get_persona()
-
     def switch_persona(self, name: str) -> bool:
         """切换全局活跃人设"""
         global _ACTIVE_PERSONA

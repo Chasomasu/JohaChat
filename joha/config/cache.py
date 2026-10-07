@@ -105,8 +105,9 @@ def cache_result(cache_instance: LRUCache, ttl: int = 300):
     def decorator(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
-            # 生成缓存键
-            key = f"{func.__name__}:{str(args)}:{str(sorted(kwargs.items()))}"
+            # 生成缓存键：跳过首个 self/cls 参数，避免实例身份污染缓存键
+            cache_args = args[1:] if args and hasattr(args[0], "__dict__") else args
+            key = f"{func.__name__}:{str(cache_args)}:{str(sorted(kwargs.items()))}"
             
             # 尝试从缓存获取
             cached = cache_instance.get(key)
