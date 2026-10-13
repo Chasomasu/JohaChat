@@ -244,7 +244,9 @@ class CommandHandler:
                 "  /人设列表          - 查看所有人设\n"
                 "  /人设信息 [名称]   - 查看人设详情\n"
                 "  /切换人设 名称     - 切换全局活跃人设\n"
-                "  /绑定人设 [群号] 名称 - 绑定群到指定人设\n"
+                "  /绑定人设 名称     - 绑定本群到指定人设（支持 id 或显示名）\n"
+                "  /绑定人设 群号 名称 - 绑定指定群到人设\n"
+                "  /绑定人设          - 查看本群当前人设\n"
                 "  /创建人设 名称|显示名|描述 - 创建新人设\n"
                 "  /删除人设 名称     - 删除人设（不可删除 joha）\n"
                 "  /人设              - 查看人设稳定性报告\n\n"
@@ -366,18 +368,23 @@ class CommandHandler:
             else:
                 response = f"❌ 删除失败，{name} 不存在或为默认人设"
 
-        elif cmd == "/绑定人设" and len(parts) >= 3:
-            group_id = parts[1]
-            persona_name = parts[2]
-            if set_group_persona(group_id, persona_name):
-                response = f"✅ 群 {group_id} 已绑定人设: {persona_name}"
+        elif cmd == "/绑定人设":
+            if len(parts) >= 3:
+                # /绑定人设 群号 人设名
+                gid = parts[1]
+                persona_name = parts[2]
+            elif len(parts) == 2:
+                # /绑定人设 人设名 → 绑定本群
+                gid = str(msg_group_id)
+                persona_name = parts[1]
             else:
-                response = f"❌ 绑定失败：未知人设 '{persona_name}'"
-
-        elif cmd == "/绑定人设" and len(parts) == 2:
-            gid = str(msg_group_id)
-            pname = get_group_persona_name(gid)
-            response = f"本群({gid}) 当前人设: {pname}"
+                # /绑定人设 → 查看本群当前人设
+                gid = str(msg_group_id)
+                response = f"本群({gid}) 当前人设: {get_group_persona_name(gid)}"
+            if persona_name and set_group_persona(gid, persona_name):
+                response = f"✅ 群 {gid} 已绑定人设: {get_group_persona_name(gid)}"
+            elif persona_name:
+                response = f"❌ 绑定失败：未知人设 '{persona_name}'，用 /人设列表 查看可用人设"
 
         # ── LLM 模型切换 ──
         elif cmd in ["/模型列表", "/模型"]:

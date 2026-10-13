@@ -354,6 +354,23 @@ class PersonaManager:
                 setattr(traits, key, value)
         return traits
 
+    def _resolve_persona_name(self, name: str) -> Optional[str]:
+        """将人设 id 或显示名解析为注册表中的 id，无法解析时返回 None。"""
+        if not name:
+            return None
+        name = name.strip()
+        if name in self._personas:
+            return name
+        for pid, info in self._personas.items():
+            if info.get("display_name") == name:
+                return pid
+        # 回退：忽略大小写匹配 id 或显示名（如 tsundere → Tsundere）
+        lower = name.lower()
+        for pid, info in self._personas.items():
+            if pid.lower() == lower or str(info.get("display_name", "")).lower() == lower:
+                return pid
+        return None
+
     def get_persona(self, name: str = "") -> Dict[str, str]:
         """获取指定人设（包含 system_prompt）"""
         if not name:
@@ -368,7 +385,7 @@ class PersonaManager:
 
     def get_persona_by_group(self, group_id: str) -> Dict[str, str]:
         """按群获取人设（群有绑定则返回绑定人设，否则返回活跃人设）"""
-        name = self._bindings.get(str(group_id), _ACTIVE_PERSONA)
+        name = self.get_group_persona_name(group_id)
         return self.get_persona(name)
 
     def _build_persona(self, name: str) -> Dict[str, str]:
@@ -559,11 +576,12 @@ class PersonaManager:
         """设置群组绑定的人设"""
         group_id = str(group_id).strip()
         persona_name = persona_name.strip()
-        if persona_name and persona_name not in self._personas:
-            logger.error(f"设置失败：未知人设 '{persona_name}'")
-            return False
         if persona_name:
-            self._bindings[group_id] = persona_name
+            resolved = self._resolve_persona_name(persona_name)
+            if resolved is None:
+                logger.error(f"设置失败：未知人设 '{persona_name}'")
+                return False
+            self._bindings[group_id] = resolved
         else:
             self._bindings.pop(group_id, None)
         self._save_registry()
@@ -572,7 +590,10 @@ class PersonaManager:
 
     def get_group_persona_name(self, group_id: str) -> str:
         """获取群绑定的当前人设名称"""
-        return self._bindings.get(str(group_id), _ACTIVE_PERSONA)
+        raw = self._bindings.get(str(group_id))
+        if raw is None:
+            return _ACTIVE_PERSONA
+        return self._resolve_persona_name(raw) or _ACTIVE_PERSONA
 
     def get_bindings(self) -> Dict[str, str]:
         """获取所有群绑定"""
