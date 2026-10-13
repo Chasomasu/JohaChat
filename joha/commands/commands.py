@@ -197,7 +197,7 @@ class CommandHandler:
                 response = await asyncio.to_thread(tool_registry.dispatch, "search", query)
 
         elif cmd in ["/webpage", "/wp", "/fetch"]:
-            from joha.core.tool_registry import tool_registry
+            from joha.runtime.tool_registry import tool_registry
             if not tool_registry._initialized:
                 tool_registry.auto_discover()
             url = parts[1] if len(parts) >= 2 else ""

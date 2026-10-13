@@ -3,8 +3,8 @@ from joha.managers.history_manager import load_history
 from joha.config.config_manager import config
 from joha.config.cache import cache_result, response_cache
 from joha.managers.style_learner import style_learner
-from joha.core.message_builder import message_builder
-from joha.core.response_postprocessor import post_processor
+from joha.messaging.message_builder import message_builder
+from joha.messaging.response_postprocessor import post_processor
 from joha.config.logger import tprint
 import asyncio
 import logging
@@ -37,7 +37,7 @@ class Generator:
 
         # 注册工具：统一来自 ToolRegistry，LLM 函数名即注册表规范名（search / webpage）
         if tool_calling_enabled:
-            from joha.core.tool_registry import get_tool_registry
+            from joha.runtime.tool_registry import get_tool_registry
             registry = get_tool_registry()
             if not registry._initialized:
                 registry.auto_discover()
