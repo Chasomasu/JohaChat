@@ -52,8 +52,17 @@ cp joha/config/config.example.json joha/config/config.json
 ### 3.2 编辑 connection.yaml
 
 ```yaml
+# 选择 OneBot 后端：napcat / snowluma
+adapter: napcat
+
 napcat:
   ws_url: ws://127.0.0.1:3002           # NapCat WebSocket 地址
+  access_token: ""                       # Token，无鉴权留空
+  bot_uin: "你的机器人QQ号"              # 必填
+  root: "你的管理员QQ号"                  # 超级管理员
+
+snowluma:
+  ws_url: ws://127.0.0.1:3001           # SnowLuma WebSocket 地址（默认 3001）
   access_token: ""                       # Token，无鉴权留空
   bot_uin: "你的机器人QQ号"              # 必填
   root: "你的管理员QQ号"                  # 超级管理员
@@ -66,6 +75,8 @@ logging:
   level: INFO                            # DEBUG/INFO/WARNING/ERROR
   log_dir: log                           # 日志目录
 ```
+
+> `adapter` 决定实际生效的后端段：`napcat` 与 `snowluma` 均为 OneBot 11 正向 WebSocket，二者的 `ws_url` 默认端口分别为 3002 / 3001。
 
 ### 3.3 编辑 config.json
 

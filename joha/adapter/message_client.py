@@ -245,8 +245,8 @@ class MessageClient:
         from joha.adapter.config import config_manager
 
         client = cls(
-            ws_url=config_manager.get("napcat.ws_url", "ws://127.0.0.1:3002"),
-            access_token=config_manager.get("napcat.access_token", ""),
+            ws_url=config_manager.get_ws_url(),
+            access_token=config_manager.get_ws_token(),
         )
         client.start(
             debug=config_manager.get("settings.debug", False),

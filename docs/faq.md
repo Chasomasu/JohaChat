@@ -216,9 +216,9 @@ NapCatQQ 是一个 QQ 机器人框架。如果你是 QQ 群聊场景，必须使
 <details>
 <summary><b>Q: WebSocket 连接失败怎么办？</b></summary>
 
-1. 确认 NapCatQQ 已启动
-2. 确认 NapCatQQ 配置中开启了 WebSocket（端口 3002）
-3. 确认 `joha/adapter/connection.yaml` 中的 `ws_url` 与 NapCatQQ 的 websocket 地址一致
+1. 确认所选后端的服务已启动（NapCat 或 SnowLuma）
+2. 确认该后端配置中已开启 WebSocket（NapCat 默认端口 3002，SnowLuma 默认 3001）
+3. 确认 `joha/adapter/connection.yaml` 中 `adapter` 指向的后端段里的 `ws_url` 与其 WebSocket 地址一致
 4. 检查防火墙是否阻止了本地连接
 </details>
 

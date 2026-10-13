@@ -51,9 +51,9 @@ class NapCatClient(IClient):
         access_token: Optional[str] = None,
     ) -> None:
         self.ws_url: str = self._normalize_ws_url(
-            ws_url or config_manager.get("napcat.ws_url", "ws://127.0.0.1:3002")
+            ws_url or config_manager.get_ws_url()
         )
-        self.access_token: str = access_token or config_manager.get("napcat.access_token", "")
+        self.access_token: str = access_token or config_manager.get_ws_token()
         self.ws: Optional[websockets.WebSocketClientProtocol] = None
         self._connected: bool = False
         self.echo_map: Dict[str, asyncio.Future[Any]] = {}
@@ -153,7 +153,7 @@ class NapCatClient(IClient):
                 was_reconnect = self._reconnect_attempts > 0
                 self._reconnect_attempts = 0
 
-                logger.info(f"成功连接到NapCat服务器: {self.ws_url}")
+                logger.info(f"成功连接到 OneBot 服务器: {self.ws_url}")
 
                 for listener in self._connection_listeners:
                     try:
@@ -311,7 +311,7 @@ class NapCatClient(IClient):
         retry_delay: float = 1.0,
     ) -> Dict[str, Any]:
         if not self.connected or not self.ws:
-            raise ConnectionError("未连接到NapCat服务器")
+            raise ConnectionError("未连接到 OneBot 服务器")
 
         last_error = None
         

@@ -66,9 +66,9 @@ grep -i "connect\|websocket\|error" johadata/johalog/ai.log
 ```
 
 确认：
-- NapCatQQ 是否在运行
-- WebSocket 端口（默认 3002）是否开放
-- `joha/adapter/connection.yaml` 中的 `ws_url` 是否正确
+- 所选后端（NapCat / SnowLuma）是否在运行
+- WebSocket 端口是否开放（NapCat 默认 3002，SnowLuma 默认 3001）
+- `joha/adapter/connection.yaml` 中 `adapter` 对应后端段的 `ws_url` 是否正确
 
 **步骤 5：检查冷却状态**
 
@@ -181,11 +181,11 @@ netstat -an | findstr 3002    # Windows
 | 原因 | 解决方式 |
 |------|----------|
 | NapCatQQ 未启动 | 启动 NapCatQQ |
-| 端口不正确 | 检查 NapCatQQ 配置中的 WebSocket 端口 |
+| 端口不正确 | 检查所选后端（NapCat / SnowLuma）配置中的 WebSocket 端口 |
 | 防火墙阻止 | 放行对应端口或使用 127.0.0.1 |
 | YAML 解析错误 | 检查 `joha/adapter/connection.yaml` 格式 |
 | `access_token` 不匹配 | 留空或填写正确 Token |
-| `bot_uin` 与 NapCat 登录账号不一致 | 修改 `run.py` 或 connection.yaml 中的 `bot_uin` |
+| `bot_uin` 与 NapCat 登录账号不一致 | 修改 `run.py` 或 connection.yaml 中 `adapter` 对应段的 `bot_uin` |
 
 ### 4.2 连接频繁断开
 

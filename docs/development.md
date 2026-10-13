@@ -52,7 +52,7 @@ JohaChat/
 │   └── johalog/                    # 运行日志
 │
 ├── joha/                           # 核心代码包
-│   ├── adapter/                    # NapCat 适配层（transport/protocol/core）
+│   ├── adapter/                    # OneBot 适配层（transport/protocol/core，支持 napcat/snowluma）
 │   ├── core/                       # 编排入口层（扁平）
 │   ├── ai/                         # AI 驱动层
 │   ├── decision/                   # 决策大脑层
@@ -176,8 +176,16 @@ class WeatherTool:
 `joha/adapter/connection.yaml`：
 
 ```yaml
+# 选择 OneBot 后端：napcat / snowluma
+adapter: napcat
+
 napcat:
   ws_url: ws://127.0.0.1:3002
+  access_token: ""
+  bot_uin: "你的机器人QQ号"
+
+snowluma:
+  ws_url: ws://127.0.0.1:3001
   access_token: ""
   bot_uin: "你的机器人QQ号"
 ```

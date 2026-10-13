@@ -16,7 +16,7 @@
 
 路径: `joha/adapter/`
 
-负责与 NapCatQQ 消息平台对接，提供 WebSocket 连接和事件抽象。分为传输层（transport）、协议层（protocol）和兼容导出层（core）三层。
+负责与 OneBot 消息平台对接，提供 WebSocket 连接和事件抽象。分为传输层（transport）、协议层（protocol）和兼容导出层（core）三层。支持 `napcat` 与 `snowluma` 两种 OneBot 后端，通过 `connection.yaml` 顶层 `adapter` 字段选择。
 
 ### message_client.py
 - **类**: `MessageClient`
@@ -58,13 +58,18 @@
 | `events.py` | events 兼容重导出 |
 | `interfaces.py` | interfaces 兼容重导出 |
 
+### backends.py
+- **职责**: OneBot 后端注册表，登记 `napcat` / `snowluma` 的元信息
+- **关键类**: `BackendSpec`（后端描述，含 `config_section`、`default_ws_url`、`auto_start_capable`）
+- **函数**: `get_backend()`（按名称获取后端描述，缺省返回 `DEFAULT_BACKEND`）
+
 ### config.py
-- **职责**: 连接配置读取（YAML）、.env 加载、日志系统初始化
-- **关键类**: `ConfigManager`（YAML 配置）、`Config`（环境变量配置）
+- **职责**: 连接配置读取（YAML）、日志系统初始化
+- **关键类**: `ConfigManager`（YAML 配置，含后端感知的 `get_ws_url()` / `get_ws_token()` / `get_bot_uin()` / `get_backend()`）
 - **函数**: `setup_logging()`、`get_logger()`
 
 ### connection.yaml
-- **职责**: NapCat 连接配置（WebSocket 地址、QQ 号等）
+- **职责**: OneBot 连接配置；顶层 `adapter` 选择后端，`napcat:` / `snowluma:` 两段分别保存各自 WebSocket 地址、Token、QQ 号等
 
 ---
 

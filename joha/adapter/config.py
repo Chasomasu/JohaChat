@@ -21,6 +21,8 @@ from typing import Any, Dict, TypeAlias
 
 import yaml
 
+from joha.adapter.backends import DEFAULT_BACKEND, BackendSpec, get_backend
+
 # ---- 类型别名 ----
 YamlConfig: TypeAlias = Dict[str, Any]
 
@@ -135,36 +137,66 @@ class ConfigManager:
         )
         print("=" * 50 + "\n")
 
-    # ==================== NapCat 配置 ====================
+    # ==================== 后端选择 ====================
+
+    def get_backend_name(self) -> str:
+        """获取当前选中的 OneBot 后端名称（连接配置顶层 adapter 字段，缺省为 napcat）"""
+        return get_backend(self.get("adapter") or DEFAULT_BACKEND).name
+
+    def set_backend(self, name: str) -> None:
+        """切换 OneBot 后端（napcat / snowluma）"""
+        self.set("adapter", get_backend(name).name)
+        self._save_config()
+
+    def get_backend(self) -> BackendSpec:
+        """获取当前后端描述"""
+        return get_backend(self.get_backend_name())
+
+    # ==================== OneBot 连接配置（后端感知） ====================
+
+    def get_ws_url(self) -> str:
+        """获取当前后端的 WebSocket 正向连接地址"""
+        backend = self.get_backend()
+        return self.get(f"{backend.config_section}.ws_url") or backend.default_ws_url
+
+    def get_ws_token(self) -> str:
+        """获取当前后端的 WebSocket 鉴权 Token"""
+        backend = self.get_backend()
+        return self.get(f"{backend.config_section}.access_token", "") or ""
+
+    def get_bot_uin(self) -> str:
+        """获取当前后端的机器人 QQ 号"""
+        backend = self.get_backend()
+        return self.get(f"{backend.config_section}.bot_uin", "") or ""
 
     def set_bot_uin(self, bot_uin: str) -> None:
-        """设置机器人 QQ 号"""
-        self.set("napcat.bot_uin", bot_uin)
+        """设置当前后端的机器人 QQ 号"""
+        self.set(f"{self.get_backend().config_section}.bot_uin", bot_uin)
         self._save_config()
 
     def set_root(self, root: str) -> None:
-        """设置根账号"""
-        self.set("napcat.root", root)
+        """设置当前后端的根账号"""
+        self.set(f"{self.get_backend().config_section}.root", root)
         self._save_config()
 
     def set_ws_uri(self, ws_uri: str) -> None:
-        """设置 WebSocket URI"""
-        self.set("napcat.ws_url", ws_uri)
+        """设置当前后端的 WebSocket URI"""
+        self.set(f"{self.get_backend().config_section}.ws_url", ws_uri)
         self._save_config()
 
     def set_ws_token(self, ws_token: str) -> None:
-        """设置 WebSocket Token"""
-        self.set("napcat.access_token", ws_token)
+        """设置当前后端的 WebSocket Token"""
+        self.set(f"{self.get_backend().config_section}.access_token", ws_token)
         self._save_config()
 
     def set_webui_uri(self, webui_uri: str) -> None:
-        """设置 WebUI URI"""
-        self.set("napcat.webui_uri", webui_uri)
+        """设置当前后端的 WebUI URI"""
+        self.set(f"{self.get_backend().config_section}.webui_uri", webui_uri)
         self._save_config()
 
     def set_webui_token(self, webui_token: str) -> None:
-        """设置 WebUI Token"""
-        self.set("napcat.webui_token", webui_token)
+        """设置当前后端的 WebUI Token"""
+        self.set(f"{self.get_backend().config_section}.webui_token", webui_token)
         self._save_config()
 
     # ==================== 日志配置 ====================

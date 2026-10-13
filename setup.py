@@ -155,20 +155,38 @@ def check_imports(report: SetupReport) -> None:
             report.add_warn(f"可选依赖缺失：{package}；需要截图功能时安装并执行 playwright install chromium")
 
 
-def check_napcat_config(report: SetupReport) -> None:
+BACKEND_DISPLAY = {
+    "napcat": "NapCat",
+    "snowluma": "SnowLuma",
+}
+
+BACKEND_DEFAULT_WS_URL = {
+    "napcat": "ws://127.0.0.1:3002",
+    "snowluma": "ws://127.0.0.1:3001",
+}
+
+
+def check_adapter_config(report: SetupReport) -> None:
     cfg = load_yaml(CONNECTION_CONFIG_FILE, report)
     if not cfg:
         return
 
-    bot_uin = cfg.get("bt_uin") or cfg.get("bot_uin")
-    napcat = cfg.get("napcat", {})
-    if not isinstance(napcat, dict):
-        report.add_err("napcat 配置必须是对象")
+    backend = str(cfg.get("adapter") or "napcat").strip().lower()
+    if backend not in BACKEND_DISPLAY:
+        report.add_err(f"未知的 adapter：{backend}，可选值：napcat / snowluma")
+        return
+    display = BACKEND_DISPLAY[backend]
+    report.add_ok(f"当前 OneBot 后端：{display}（adapter: {backend}）")
+
+    section = cfg.get(backend, {})
+    if not isinstance(section, dict):
+        report.add_err(f"{backend} 配置必须是对象")
         return
 
-    ws_url = napcat.get("ws_url")
-    access_token = napcat.get("access_token")
-    webui_uri = napcat.get("webui_uri")
+    bot_uin = section.get("bot_uin") or cfg.get("bt_uin") or cfg.get("bot_uin")
+    ws_url = section.get("ws_url")
+    access_token = section.get("access_token")
+    webui_uri = section.get("webui_uri")
 
     if bot_uin:
         report.add_ok(f"机器人 QQ：{bot_uin}")
@@ -178,32 +196,36 @@ def check_napcat_config(report: SetupReport) -> None:
     if ws_url:
         parsed = urlparse(str(ws_url))
         if parsed.scheme in {"ws", "wss"} and parsed.hostname and parsed.port:
-            report.add_ok(f"NapCat WebSocket：{ws_url}")
-            check_ws_port(report, parsed.hostname, parsed.port)
+            report.add_ok(f"{display} WebSocket：{ws_url}")
+            check_ws_port(report, display, parsed.hostname, parsed.port)
         else:
-            report.add_err("napcat.ws_url 格式不正确，示例：ws://127.0.0.1:3002")
+            report.add_err(
+                f"{backend}.ws_url 格式不正确，示例：{BACKEND_DEFAULT_WS_URL[backend]}"
+            )
     else:
-        report.add_err("未配置 napcat.ws_url")
+        report.add_err(f"未配置 {backend}.ws_url")
 
     if access_token:
-        report.add_ok(f"NapCat WebSocket Token：{mask_secret(access_token)}")
+        report.add_ok(f"{display} WebSocket Token：{mask_secret(access_token)}")
     else:
-        report.add_warn("napcat.access_token 为空；如果 NapCat 配置了 token，机器人会连接失败")
+        report.add_warn(
+            f"{backend}.access_token 为空；如果 {display} 配置了 token，机器人会连接失败"
+        )
 
     if webui_uri:
-        report.add_ok(f"NapCat WebUI：{webui_uri}")
+        report.add_ok(f"{display} WebUI：{webui_uri}")
     else:
-        report.add_warn("未配置 napcat.webui_uri")
+        report.add_warn(f"未配置 {backend}.webui_uri")
 
-    report.add_warn("NapCat 自动拉起已移除，请先手动启动 NapCat")
+    report.add_warn(f"{display} 自动拉起已移除，请先手动启动 {display}")
 
 
-def check_ws_port(report: SetupReport, host: str, port: int) -> None:
+def check_ws_port(report: SetupReport, display: str, host: str, port: int) -> None:
     try:
         with socket.create_connection((host, port), timeout=1.5):
-            report.add_ok(f"NapCat 端口可连接：{host}:{port}")
+            report.add_ok(f"{display} 端口可连接：{host}:{port}")
     except OSError:
-        report.add_warn(f"NapCat 端口暂不可连接：{host}:{port}；启动 NapCat 后再运行机器人")
+        report.add_warn(f"{display} 端口暂不可连接：{host}:{port}；启动 {display} 后再运行机器人")
 
 
 def check_llm_config(report: SetupReport) -> None:
@@ -279,9 +301,9 @@ def print_steps() -> None:
         "1. 安装 Python 3.10 或更高版本，并确认命令行可执行 python。",
         "2. 在项目根目录执行：python -m pip install -r requirements.txt",
         "3. 如需网页截图功能，执行：python -m playwright install chromium",
-        "4. 编辑 joha/adapter/connection.yaml：填写 bot_uin、napcat.ws_url、napcat.access_token，并确认端口与 NapCat 一致。",
+        "4. 编辑 joha/adapter/connection.yaml：设置顶层 adapter（napcat 或 snowluma），并在对应段填写 bot_uin、ws_url、access_token，确认端口与后端一致。",
         "5. 编辑 joha/config/config.json：设置 chat-llm.active_provider，并确保对应 provider 的 api_key、base_url、model 完整。",
-        "6. 启动 NapCat，并确保 WebSocket 服务已开启。",
+        "6. 启动 NapCat 或 SnowLuma，并确保其 OneBot WebSocket 服务已开启。",
         "7. 回到项目根目录执行：python setup.py --check，确认没有 [ERR]。",
         "8. 启动机器人：python run.py",
     ]
@@ -295,7 +317,7 @@ def run_check(fix: bool) -> SetupReport:
     check_files(report)
     check_dirs(report, fix)
     check_imports(report)
-    check_napcat_config(report)
+    check_adapter_config(report)
     check_llm_config(report)
     return report
 

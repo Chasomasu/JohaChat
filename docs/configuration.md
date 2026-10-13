@@ -16,13 +16,26 @@
 
 ## 2. 连接配置 — `joha/adapter/connection.yaml`
 
+顶层 `adapter` 字段用于选择 OneBot 后端，可选 `napcat` 或 `snowluma`（二者均基于 OneBot 11 正向 WebSocket，仅默认端口与自动拉起能力不同）。下方 `napcat:` / `snowluma:` 两段分别保存各自后端的连接参数，实际生效的是与 `adapter` 同名的那一段。
+
 ```yaml
+# 选择 OneBot 后端：napcat / snowluma
+adapter: napcat
+
 napcat:
   ws_url: "ws://127.0.0.1:3002"      # NapCatQQ WebSocket 地址
   access_token: ""                    # 鉴权 Token（如需要）
   bot_uin: 8888888888                 # 机器人 QQ 号
   root: ""                            # 超级管理员 QQ 号（可选）
   webui_uri: http://127.0.0.1:6099    # NapCat WebUI 地址（可选）
+  webui_token: ""                     # WebUI Token（如需要）
+
+snowluma:
+  ws_url: "ws://127.0.0.1:3001"      # SnowLuma WebSocket 地址（默认 3001）
+  access_token: ""                    # 鉴权 Token（如需要）
+  bot_uin: 8888888888                 # 机器人 QQ 号
+  root: ""                            # 超级管理员 QQ 号（可选）
+  webui_uri: http://127.0.0.1:5099    # SnowLuma WebUI 地址（默认 5099）
   webui_token: ""                     # WebUI Token（如需要）
 
 settings:
@@ -38,15 +51,23 @@ logging:
 
 | 参数 | 类型 | 默认值 | 说明 |
 |------|------|--------|------|
+| `adapter` | string | `napcat` | 选中的 OneBot 后端，可选 `napcat` / `snowluma` |
 | `napcat.ws_url` | string | `ws://127.0.0.1:3002` | NapCatQQ 的 WebSocket 正向连接地址 |
 | `napcat.access_token` | string | `""` | WebSocket 鉴权 Token，无鉴权留空 |
 | `napcat.bot_uin` | int/string | `8888888888` | 机器人的 QQ 号码 |
 | `napcat.root` | string | `""` | 超级管理员 QQ 号 |
 | `napcat.webui_uri` | string | `http://127.0.0.1:6099` | NapCat WebUI 地址 |
+| `snowluma.ws_url` | string | `ws://127.0.0.1:3001` | SnowLuma 的 WebSocket 正向连接地址 |
+| `snowluma.access_token` | string | `""` | WebSocket 鉴权 Token，无鉴权留空 |
+| `snowluma.bot_uin` | int/string | `8888888888` | 机器人的 QQ 号码 |
+| `snowluma.root` | string | `""` | 超级管理员 QQ 号 |
+| `snowluma.webui_uri` | string | `http://127.0.0.1:5099` | SnowLuma WebUI 地址 |
 | `settings.debug` | bool | `true` | 调试模式开关，开启会输出更多日志 |
 | `settings.hot_reload` | bool | `false` | 开发热重载开关（监控 joha/ 目录） |
 | `logging.level` | string | `INFO` | 日志级别（DEBUG/INFO/WARNING/ERROR） |
 | `logging.log_dir` | string | `log` | 日志目录 |
+
+> 切换后端只需修改顶层 `adapter` 字段；运行时通过 `config_manager.get_ws_url()` / `get_ws_token()` / `get_bot_uin()` 读取当前后端的对应参数。
 
 ---
 

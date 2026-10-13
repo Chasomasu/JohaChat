@@ -1,10 +1,16 @@
 """
 Joha Adapter —— 主入口模块
-NapCat 适配层：连接、事件、API、配置管理
+OneBot 适配层：连接、事件、API、配置管理，支持 napcat / snowluma 后端
 """
 
 from __future__ import annotations
 
+from joha.adapter.backends import (
+    BACKENDS,
+    DEFAULT_BACKEND,
+    BackendSpec,
+    get_backend,
+)
 from joha.adapter.message_client import MessageClient
 from joha.adapter.config import ConfigManager, config_manager, setup_logging, get_logger
 from joha.adapter.transport import NapCatClient
@@ -52,5 +58,9 @@ __all__: list[str] = [
     "setup_logging",
     "get_logger",
     "MessageClient",
+    "BACKENDS",
+    "DEFAULT_BACKEND",
+    "BackendSpec",
+    "get_backend",
     "__version__",
 ]

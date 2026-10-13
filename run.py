@@ -22,9 +22,9 @@ RUN_CONNECT_CONFIG = {
     "debug": None,
 }
 
-WS_URL = RUN_CONNECT_CONFIG["ws_url"] or config_manager.get("napcat.ws_url", "ws://127.0.0.1:3002")
-ACCESS_TOKEN = RUN_CONNECT_CONFIG["access_token"] or config_manager.get("napcat.access_token", "")
-BOT_UIN = RUN_CONNECT_CONFIG["bot_uin"] or config_manager.get("napcat.bot_uin", "8888888888")
+WS_URL = RUN_CONNECT_CONFIG["ws_url"] or config_manager.get_ws_url()
+ACCESS_TOKEN = RUN_CONNECT_CONFIG["access_token"] or config_manager.get_ws_token()
+BOT_UIN = RUN_CONNECT_CONFIG["bot_uin"] or config_manager.get_bot_uin() or "8888888888"
 DEBUG = RUN_CONNECT_CONFIG["debug"] if RUN_CONNECT_CONFIG["debug"] is not None else config_manager.get("settings.debug", True)
 
 runtime_context.bot_uin = int(BOT_UIN)
