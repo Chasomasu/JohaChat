@@ -8,9 +8,9 @@ from typing import Optional, Dict, Any
 from dataclasses import dataclass, field
 
 from joha.ai.generator import generator
-from joha.core.message_builder import message_builder
-from joha.core.response_postprocessor import post_processor
-from joha.core.tool_registry import get_tool_registry, tool_registry
+from joha.messaging.message_builder import message_builder
+from joha.messaging.response_postprocessor import post_processor
+from joha.runtime.tool_registry import get_tool_registry, tool_registry
 from joha.managers.history_manager import history_manager
 from joha.managers.style_learner import style_learner
 from joha.managers.group_conversation import group_conversation

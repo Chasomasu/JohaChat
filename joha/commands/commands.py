@@ -5,11 +5,11 @@
 from typing import Optional
 import asyncio
 
-from joha.core.service import message_service
+from joha.engine.service import message_service
 from joha.managers.style_learner import style_learner
 from joha.config.config_manager import config
 # generator 仅在 /切换模型 命令中延迟导入，避免 LLM 未配置时影响其他管理命令
-from joha.core.persona_monitor import persona_monitor
+from joha.managers.persona_monitor import persona_monitor
 from joha.managers.personas import (
     list_personas, persona_info, switch_persona,
     create_persona, delete_persona, set_group_persona, get_group_persona_name,
@@ -179,14 +179,14 @@ class CommandHandler:
 
         # ── 工具命令（所有人可用）──
         elif cmd in ["/tools", "/工具列表"]:
-            from joha.core.tool_registry import tool_registry
+            from joha.runtime.tool_registry import tool_registry
             if not tool_registry._initialized:
                 tool_registry.auto_discover()
             tools_desc = tool_registry.get_help_text()
             response = "🛠 可用工具：\n" + ("\n".join(tools_desc.split("\n")[1:]) if "\n" in tools_desc else tools_desc)
 
         elif cmd in ["/search", "/s", "/web_search"]:
-            from joha.core.tool_registry import tool_registry
+            from joha.runtime.tool_registry import tool_registry
             if not tool_registry._initialized:
                 tool_registry.auto_discover()
             query = parts[1] if len(parts) >= 2 else ""

@@ -17,11 +17,11 @@ import re
 from typing import Optional
 
 from joha.adapter import GroupMessageEvent
-from joha.core.service import message_service
-from joha.core.commands import command_handler, normalize_fallback_command
-from joha.core.runtime_context import runtime_context
-from joha.core.message_queue import message_queue_manager, MergedMessage
-from joha.core.image_utils import extract_images_from_sdk_event
+from .service import message_service
+from joha.commands import command_handler, normalize_fallback_command
+from joha.runtime.runtime_context import runtime_context
+from joha.messaging.message_queue import message_queue_manager, MergedMessage
+from joha.messaging.image_utils import extract_images_from_sdk_event
 from joha.config.logger import johalog_logger, tprint
 from joha.decision.group_state import group_state_manager
 

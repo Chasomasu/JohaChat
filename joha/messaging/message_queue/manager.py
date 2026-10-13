@@ -4,47 +4,10 @@
 """
 import time
 from typing import Dict, List, Optional
-from dataclasses import dataclass, field
 from collections import defaultdict
+
 from joha.config.logger import tprint, johalog_logger
-
-
-@dataclass
-class QueuedMessage:
-    """队列中的消息"""
-    user_id: str
-    group_id: str
-    message: str
-    timestamp: float
-    images: List[str] = field(default_factory=list)
-    is_at_bot: bool = False
-    reply_to_bot: bool = False
-    is_pure_sticker_or_image: bool = False
-
-
-@dataclass
-class MergedMessage:
-    """合并后的消息"""
-    user_id: str
-    group_id: str
-    messages: List[str]  # 原始消息列表
-    merged_text: str     # 合并后的文本
-    timestamp: float     # 第一条消息的时间
-    last_timestamp: float  # 最后一条消息的时间
-    images: List[str] = field(default_factory=list)
-    is_at_bot: bool = False
-    reply_to_bot: bool = False
-    is_pure_sticker_or_image: bool = False
-    
-    @property
-    def duration(self) -> float:
-        """消息持续时间（秒）"""
-        return self.last_timestamp - self.timestamp
-    
-    @property
-    def count(self) -> int:
-        """消息数量"""
-        return len(self.messages)
+from .models import QueuedMessage, MergedMessage
 
 
 class MessageQueueManager:
@@ -378,7 +341,3 @@ class MessageQueueManager:
         total = sum(len(q) for q in self.message_queues.values())
         self.message_queues.clear()
         return total
-
-
-# 全局消息队列管理器实例（参数从 config.json 的 message_queue 段读取）
-message_queue_manager = MessageQueueManager()
