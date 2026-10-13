@@ -3,13 +3,14 @@ Joha 统一启动入口
 """
 
 from joha.adapter import MessageClient, GroupMessageEvent, config_manager
-from joha.core import message_handler, runtime_context
-from joha.core.message_handler import process_merged_message
-from joha.core.message_queue import message_queue_manager
+from joha.engine import message_handler
+from joha.engine.message_handler import process_merged_message
+from joha.messaging.message_queue import message_queue_manager
 from joha.managers.user_profile import user_profile_manager
 from joha.managers.style_learner import style_learner
 from joha.decision.cooldown import cooldown_manager
-from joha.core.hot_reload import hot_reloader
+from joha.runtime import runtime_context
+from joha.runtime.hot_reload import hot_reloader
 from joha.config.logger import tprint
 
 

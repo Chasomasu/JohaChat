@@ -8,7 +8,7 @@ import os
 import shutil
 import uuid
 
-from joha.core.message_queue import MessageQueueManager, MergedMessage
+from joha.messaging.message_queue import MessageQueueManager, MergedMessage
 
 TEST_BASE = os.path.join(os.path.dirname(__file__), "_test_tmp")
 

@@ -4,7 +4,7 @@
 import unittest
 import os
 
-from joha.core.message_builder import MessageBuilder
+from joha.messaging.message_builder import MessageBuilder
 
 
 class TestMessageBuilder(unittest.TestCase):

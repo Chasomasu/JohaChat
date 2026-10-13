@@ -2,16 +2,22 @@
 Joha - 智能聊天机器人框架 v1.0.0
 
 模块化架构：
-  core/        — 编排入口（服务、消息处理、命令处理、运行时上下文）
+  engine/      — 编排入口（消息服务、消息处理）
+  messaging/   — 排队合并、消息组装、图像工具、回复后处理
+  commands/    — 命令处理
+  runtime/     — 应用上下文、工具注册表、热重载
   ai/          — AI 驱动（客户端、生成器、Provider、Bot、分类器）
   decision/    — 决策大脑（回复概率、冷却、群状态、工具调用）
-  managers/    — 数据管理（历史、画像、风格、人设、权限）
+  managers/    — 数据管理（历史、画像、风格、人设、权限、人设监控）
   config/      — 基础设施（配置、日志、缓存）
 """
 
-from .core import (
+from .engine import (
     message_service,
     message_handler,
+)
+
+from .commands import (
     command_handler,
 )
 

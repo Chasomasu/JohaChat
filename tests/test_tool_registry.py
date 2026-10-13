@@ -5,7 +5,7 @@ import unittest
 import os
 import json
 
-from joha.core.tool_registry import ToolRegistry, DEFAULT_TOOLS_DIR
+from joha.runtime.tool_registry import ToolRegistry, DEFAULT_TOOLS_DIR
 
 
 class TestToolRegistry(unittest.TestCase):

@@ -5,7 +5,7 @@ import unittest
 import asyncio
 from unittest.mock import AsyncMock, patch
 
-from joha.core.service import MessageService, MessageContext
+from joha.engine.service import MessageService, MessageContext
 
 
 class TestMessageServiceStages(unittest.TestCase):

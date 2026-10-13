@@ -12,6 +12,8 @@ from .personas import (
 from .admin import admin_manager
 from .group_conversation import group_conversation
 from .group_memory import group_memory_manager
+from .persona_monitor import persona_monitor, PersonaStabilityMonitor
+from .clean_history import HistoryCleaner
 
 __all__ = [
     'history_manager', 'load_history',
@@ -25,4 +27,6 @@ __all__ = [
     'admin_manager',
     'group_conversation',
     'group_memory_manager',
+    'persona_monitor', 'PersonaStabilityMonitor',
+    'HistoryCleaner',
 ]
