@@ -286,7 +286,7 @@ asyncio.run(test())
 开发时可启用模块热重载，监控 `joha/` 目录文件变化：
 
 ```python
-from joha.core.hot_reload import hot_reloader
+from joha.runtime.hot_reload import hot_reloader
 
 hot_reloader.start()
 # 修改 joha/ 下的 .py 文件会自动重载

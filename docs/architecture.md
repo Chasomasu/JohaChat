@@ -10,7 +10,13 @@ Joha 采用**分层 + 事件驱动**的架构设计，从上到下分为：
 ├─────────────────────────────────────────────┤
 │           适配层 (joha.adapter)              │  ← transport / protocol / core
 ├─────────────────────────────────────────────┤
-│           编排层 (joha.core)                 │  ← 消息处理、命令路由、队列合并
+│           引擎层 (joha.engine)               │  ← 业务编排：学习 → 决策 → 生成
+├─────────────────────────────────────────────┤
+│           消息层 (joha.messaging)            │  ← 上下文组装、队列合并、后处理
+├─────────────────────────────────────────────┤
+│           命令层 (joha.commands)             │  ← 斜杠命令解析与路由
+├─────────────────────────────────────────────┤
+│           运行时 (joha.runtime)              │  ← 上下文、工具注册、热重载
 ├─────────────────────────────────────────────┤
 │           决策层 (joha.decision)             │  ← 回复概率计算、意图分类
 ├─────────────────────────────────────────────┤
@@ -41,7 +47,7 @@ Joha 采用**分层 + 事件驱动**的架构设计，从上到下分为：
 ### MCP 风格调用（AI 自主调用）
 
 ```python
-from joha.core.tool_registry import tool_registry
+from joha.runtime.tool_registry import tool_registry
 
 tool_registry.auto_discover()
 
@@ -83,24 +89,41 @@ tools_schema = tool_registry.list_tools()
 - `GroupMessageEvent`: 群消息事件模型
 - `BotAPI`: OneBot 协议 API 封装
 
-### 2.2 编排层 (joha.core)
+### 2.2 引擎层 (joha.engine)、消息层 (joha.messaging)、命令层 (joha.commands)、运行时 (joha.runtime)
 
-扁平结构，负责消息流入后的预处理、命令识别、业务编排。
+参照 Masu 架构，原 `joha.core` 拆分如下：
+
+**engine/** — 业务编排：
 
 | 模块 | 文件 | 职责 |
 |------|------|------|
 | 消息处理器 | `message_handler.py` | 消息接收、@/回复检测、队列合并调度 |
-| 命令处理器 | `commands.py` | 斜杠命令解析与路由（含自然语言别名） |
 | 业务服务 | `service.py` | 核心编排：学习 → 决策 → 生成的完整流水线 |
+
+**messaging/** — 消息组装与队列：
+
+| 模块 | 文件 | 职责 |
+|------|------|------|
 | 消息构建器 | `message_builder.py` | LLM 上下文组装（人设、历史、记忆、工具） |
-| 消息队列 | `message_queue.py` | 短时间多条消息合并，减少冗余回复 |
-| 运行时上下文 | `runtime_context.py` | 全局运行时状态（bot_uin 等） |
-| 人设监控 | `persona_monitor.py` | 人设参数监控与稳定性报告 |
-| 工具注册 | `tool_registry.py` | 工具自动发现与注册 |
+| 消息队列 | `message_queue/`（manager + models） | 短时间多条消息合并，减少冗余回复 |
 | 回复后处理 | `response_postprocessor.py` | 回复过滤、格式化 |
 | 图片工具 | `image_utils.py` | 图片格式转换与处理 |
-| 历史清洗 | `clean_history.py` | 历史记录清洗与压缩 |
+
+**commands/** — 命令路由：
+
+| 模块 | 文件 | 职责 |
+|------|------|------|
+| 命令处理器 | `commands.py` | 斜杠命令解析与路由（含自然语言别名） |
+
+**runtime/** — 运行时状态：
+
+| 模块 | 文件 | 职责 |
+|------|------|------|
+| 运行时上下文 | `runtime_context.py` | 全局运行时状态（bot_uin 等） |
+| 工具注册 | `tool_registry.py` | 工具自动发现与注册 |
 | 热重载 | `hot_reload.py` | 开发时模块热重载 |
+
+其余原 core 模块移至 managers/：`persona_monitor.py`、`clean_history.py`。
 
 ### 2.3 决策层 (joha.decision)
 
@@ -147,7 +170,7 @@ Joha 的核心亮点，负责判断机器人在什么场景下应该回复。
 
 | 模块 | 文件 | 职责 |
 |------|------|------|
-| ToolRegistry 中台 | `joha.core.tool_registry` | 自动发现 JSON 描述符、Python 实现双注册；提供 MCP 风格 `call_tool()` / `list_tools()` 接口 |
+| ToolRegistry 中台 | `joha.runtime.tool_registry` | 自动发现 JSON 描述符、Python 实现双注册；提供 MCP 风格 `call_tool()` / `list_tools()` 接口 |
 | `tool.json` | `joha/tools/<name>/tool.json` | MCP JSON Schema 描述符（接口定义 + 参数校验） |
 | `tool.py` | `joha/tools/<name>/tool.py` | `execute()` 函数（ToolRegistry 调度入口） |
 | `core.py` | `joha/tools/<name>/core.py` | 真实实现 |

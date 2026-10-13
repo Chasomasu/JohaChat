@@ -134,12 +134,12 @@ from joha.adapter.protocol import BotAPI
 
 ## 4. MessageHandler
 
-路径: `joha.core.message_handler`
+路径: `joha.engine.message_handler`
 
 消息处理入口。
 
 ```python
-from joha.core.message_handler import message_handler, process_merged_message
+from joha.engine.message_handler import message_handler, process_merged_message
 
 await message_handler.process_group_message(event, api)
 ```
@@ -155,12 +155,12 @@ await message_handler.process_group_message(event, api)
 
 ## 5. MessageService
 
-路径: `joha.core.service.MessageService`
+路径: `joha.engine.service.MessageService`
 
 核心业务编排（学习 → 决策 → 生成）。
 
 ```python
-from joha.core.service import message_service
+from joha.engine.service import message_service
 
 response = await message_service.process_message(
     userid="123456",
@@ -473,12 +473,12 @@ group_mode_config.set_mode(group_id, "passive")
 
 ## 15. RuntimeContext
 
-路径: `joha.core.runtime_context`
+路径: `joha.runtime.runtime_context`
 
 运行时全局上下文。
 
 ```python
-from joha.core import runtime_context
+from joha.runtime import runtime_context
 
 # 设置机器人 QQ 号
 runtime_context.bot_uin = 123456789
@@ -497,12 +497,12 @@ print(runtime_context.bot_uin)
 
 ## 16. ToolRegistry
 
-路径: `joha.core.tool_registry.ToolRegistry`
+路径: `joha.runtime.tool_registry.ToolRegistry`
 
 工具注册表中台，实现 MCP 风格的自动发现、注册和调度。
 
 ```python
-from joha.core.tool_registry import tool_registry, get_tool_registry
+from joha.runtime.tool_registry import tool_registry, get_tool_registry
 
 # 自动发现
 tool_registry.auto_discover()
@@ -555,8 +555,8 @@ tools = tool_registry.list_tools()
 
 | 模块 | 路径 | 说明 |
 |------|------|------|
-| MessageQueueManager | `joha.core.message_queue` | 消息队列合并（`message_queue_manager`） |
-| MessageBuilder | `joha.core.message_builder` | LLM 上下文组装（`message_builder`） |
+| MessageQueueManager | `joha.messaging.message_queue` | 消息队列合并（`message_queue_manager`） |
+| MessageBuilder | `joha.messaging.message_builder` | LLM 上下文组装（`message_builder`） |
 | HistoryManager | `joha.managers.history_manager` | 聊天历史管理（`history_manager`） |
 | StyleLearner | `joha.managers.style_learner` | 风格学习（`style_learner`） |
 | GroupConversation | `joha.managers.group_conversation` | 群对话记忆（`group_conversation`） |

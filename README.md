@@ -101,7 +101,7 @@ python run.py
 ## 🏗️ 架构一览
 
 ```
-NapCatQQ → adapter 适配层 → core 编排层 → decision 决策层 → ai 驱动层 → 回复
+NapCatQQ → adapter 适配层 → engine 编排层 → decision 决策层 → ai 驱动层 → 回复
                               managers 数据管理层 / tools 工具层 / config 基础设施
 ```
 

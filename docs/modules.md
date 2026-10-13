@@ -242,7 +242,7 @@ joha/tools/<tool_name>/
 
 | 组件 | 路径 | 职责 |
 |------|------|------|
-| `ToolRegistry` | `joha.core.tool_registry` | 中台：自动发现、注册、call_tool/list_tools/dispatch |
+| `ToolRegistry` | `joha.runtime.tool_registry` | 中台：自动发现、注册、call_tool/list_tools/dispatch |
 | `tool.json` | `joha/tools/<name>/tool.json` | MCP 风格 JSON 描述符（参数校验用） |
 | `tool.py` | `joha/tools/<name>/tool.py` | `execute()` 函数，被 ToolRegistry 调度 |
 | `core.py` | `joha/tools/<name>/core.py` | 真实实现（搜索、抓取等） |
